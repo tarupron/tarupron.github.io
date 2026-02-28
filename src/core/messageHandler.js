@@ -1,0 +1,246 @@
+export class MessageHandler {
+    constructor(viewer) {
+        this.viewer = viewer;
+    }
+
+    processMessages(messages) {
+        messages.forEach(msg => {
+            if (msg.cmd === 'RoomInfo' && this.viewer.connectionManager.getPendingConnection()) {
+                this.handleRoomInfo(msg);
+                const pending = this.viewer.connectionManager.getPendingConnection();
+                this.viewer.connectionManager.sendConnect(pending.slot, pending.password, msg.version);
+                this.viewer.connectionManager.clearPendingConnection();
+            } else {
+                this.processMessage(msg);
+            }
+        });
+    }
+
+    processMessage(msg) {
+        if (msg.players || msg.player_info || msg.slots) {
+            this.viewer.playersListManager.updatePlayers(msg, this.viewer.players);
+        }
+
+        switch (msg.cmd) {
+            case 'RoomInfo':
+                this.handleRoomInfo(msg);
+                break;
+            case 'Connected':
+                this.handleConnected(msg);
+                break;
+            case 'RoomUpdate':
+                this.handleRoomUpdate(msg);
+                break;
+            case 'Chat':
+                this.handleChat(msg);
+                break;
+            case 'PrintJSON':
+                this.handlePrintJSON(msg);
+                break;
+            case 'DataPackage':
+                this.handleDataPackage(msg);
+                break;
+            case 'ConnectionRefused':
+                let reasonText = Array.isArray(msg.errors) ? msg.errors.join(', ') : (msg.error || 'Unknown error');
+                // Insert spaces between camel‑cased words (e.g. InvalidSlot -> Invalid Slot)
+                reasonText = reasonText.replace(/([a-z])([A-Z])/g, '$1 $2');
+                console.error('Connection refused:', reasonText, msg);
+                this.viewer.showStatus(reasonText, 'error');
+                this.viewer.disconnect();
+                break;
+            case 'InvalidPacket':
+                console.error('Server rejected packet:', msg);
+                this.viewer.showStatus('Invalid connection packet: ' + (msg.text || 'Unknown error'), 'error');
+                this.viewer.disconnect();
+                break;
+            default:
+                console.warn('Unknown message type:', msg);
+        }
+    }
+
+    handleRoomInfo(msg) {
+        this.viewer.roomInfo = msg;
+        this.viewer.playersListManager.updatePlayers(msg, this.viewer.players);
+    }
+
+    handleConnected(msg) {
+        this.viewer.connected = true;
+        this.viewer.connectionManager.setConnected(true);
+        
+        if (msg.team !== undefined) this.viewer.currentTeam = msg.team;
+        if (msg.slot !== undefined) {
+            this.viewer.currentSlotNumber = msg.slot;
+            this.viewer.playersListManager.setCurrentSlotNumber(msg.slot);
+        }
+        
+        // Change connect button into disconnect state
+        this.viewer.connectBtn.textContent = 'Connected';
+        this.viewer.connectBtn.classList.remove('btn-primary');
+        this.viewer.connectBtn.classList.add('btn-secondary');
+        this.viewer.connectBtn.disabled = false;
+
+        // Enable command entry
+        this.viewer.commandInput.disabled = false;
+        this.viewer.sendCommandBtn.disabled = false;
+
+        // Show main content area
+        this.viewer.mainContent.style.display = 'flex';
+
+        // Disable connection inputs to prevent mid-session changes
+        this.viewer.hostInput.disabled = true;
+        this.viewer.slotInput.disabled = true;
+        this.viewer.passwordInput.disabled = true;
+
+        this.viewer.messages = [];
+        this.viewer.chatDisplayManager.clear();
+
+        // If room info arrived earlier, refresh player list now that we're joined
+        if (this.viewer.roomInfo) {
+            this.viewer.playersListManager.updatePlayers(this.viewer.roomInfo, this.viewer.players);
+        }
+
+        // Update players with player list from Connected message
+        if (msg.players) {
+            this.viewer.playersListManager.updatePlayers({ players: msg.players }, this.viewer.players);
+            
+            // Mark all players from the Connected message as online (they're in the room)
+            msg.players.forEach(playerInfo => {
+                const player = this.viewer.players.get(playerInfo.slot);
+                if (player) {
+                    player.online = true;
+                }
+            });
+        }
+
+        // Update game assignments from slot_info
+        if (msg.slot_info) {
+            Object.entries(msg.slot_info).forEach(([slotId, info]) => {
+                const slot = parseInt(slotId);
+                const player = this.viewer.players.get(slot);
+                if (player && info.game) {
+                    player.game = info.game;
+                }
+            });
+        }
+
+        // Clean up duplicate entries that used player name as key
+        if (this.viewer.currentSlot && this.viewer.players.has(this.viewer.currentSlot)) {
+            this.viewer.players.delete(this.viewer.currentSlot);
+        }
+
+        // Mark viewer status: only actual game slots are "Connected", viewers are "Disconnected"
+        if (this.viewer.currentSlotNumber) {
+            const player = this.viewer.players.get(this.viewer.currentSlotNumber);
+            const hasGame = msg.slot_info && msg.slot_info[this.viewer.currentSlotNumber] && msg.slot_info[this.viewer.currentSlotNumber].game;
+            
+            if (player) {
+                // Only mark as online if this slot has a game assignment (not a viewer)
+                player.online = hasGame ? true : false;
+            } else {
+                this.viewer.players.set(this.viewer.currentSlotNumber, { 
+                    name: this.viewer.currentSlot, 
+                    slot: this.viewer.currentSlotNumber,
+                    game: hasGame ? 'Unknown' : 'Viewer',
+                    online: hasGame ? true : false
+                });
+            }
+            this.viewer.playersListManager.render(this.viewer.players);
+        }
+
+        // Display system message
+        this.viewer.chatDisplayManager.addSystemMessage('Connected to server as ' + this.viewer.currentSlot, this.viewer.messages);
+        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+    }
+
+    handleChat(msg) {
+        const message = {
+            type: 'chat',
+            from: msg.name || 'System',
+            text: msg.text || '',
+            timestamp: new Date()
+        };
+        this.viewer.messages.push(message);
+        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+    }
+
+    handlePrintJSON(msg) {
+        if (msg.data && Array.isArray(msg.data)) {
+            let hasItemCheat = false;
+            let hasTextContent = false;
+            let textContent = '';
+            
+            msg.data.forEach(item => {
+                if (msg.type === 'ItemCheat') {
+                    hasItemCheat = true;
+                } else if (msg.type == 'Join') {
+                    // Extract player slot from Join message and mark them as online
+                    if (msg.slot !== undefined) {
+                        const player = this.viewer.players.get(msg.slot);
+                        if (player) {
+                            player.online = true;
+                            this.viewer.playersListManager.render(this.viewer.players);
+                        }
+                    }
+                    this.viewer.chatDisplayManager.addSystemMessage(item.text, this.viewer.messages);
+                } else if (msg.type == 'Leave') {
+                    // Extract player slot from Leave message and mark them as offline
+                    if (msg.slot !== undefined) {
+                        const player = this.viewer.players.get(msg.slot);
+                        if (player) {
+                            player.online = false;
+                            this.viewer.playersListManager.render(this.viewer.players);
+                        }
+                    }
+                    this.viewer.chatDisplayManager.addSystemMessage(item.text, this.viewer.messages);
+                } else if (msg.type == 'Tutorial') {
+                    this.viewer.chatDisplayManager.addSystemMessage(item.text, this.viewer.messages);
+                } else if (item.text) {
+                    hasTextContent = true;
+                    textContent += item.text;
+                }
+            });
+            
+            // Add ItemCheat messages
+            if (hasItemCheat) {
+                msg.data.forEach(item => {
+                    if (msg.type === 'ItemCheat') {
+                        const message = {
+                            type: 'check',
+                            to: item.item?.player,
+                            item: item.item?.item,
+                            location: item.location?.location,
+                            isReceived: item.item?.player === this.viewer.currentSlotNumber,
+                            isSent: item.slot === this.viewer.currentSlotNumber,
+                            timestamp: new Date()
+                        };
+                        this.viewer.messages.push(message);
+                    }
+                });
+            }
+            
+            // Add text content as a single chat message (if not all ItemCheat)
+            if (hasTextContent && textContent.trim().length > 0) {
+                // Translate textContent to a more user-friendly format if it contains known patterns
+                const finalText = /^\d/.test(textContent) ? this.viewer.convertMessageToHumanReadable(textContent) : textContent;
+                const message = {
+                    type: finalText.includes('their') ? 'yours' : 'chat',
+                    text: finalText,
+                    timestamp: new Date()
+                };
+                this.viewer.messages.push(message);
+            }
+            
+            this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+        }
+    }
+
+    handleRoomUpdate(msg) {
+        if (msg.players) {
+            this.viewer.playersListManager.updatePlayers({ players: msg.players }, this.viewer.players);
+        }
+    }
+
+    handleDataPackage(msg) {
+        this.viewer.dataPackage = msg.data || msg;
+    }
+}

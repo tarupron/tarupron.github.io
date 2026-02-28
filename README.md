@@ -5,10 +5,6 @@ A web application to connect to an Archipelago server and monitor the chat log i
 ## Features
 
 - **Real-time Server Connection**: Connect to any Archipelago server using WebSocket
-- **Chat Log with Filtering**: 
-  - View all messages and checks
-  - Filter by "Sent" (only checks you've sent)
-  - Filter by "Received" (only checks you've received)
 - **Player Dashboard**: View all players in the multiworld, their games, and check progress (e.g., 30/100)
 - **Command Interface**: Send commands directly to the server
 - **Light/Dark Mode**: Toggle between light and dark themes with persistent preference storage
@@ -17,11 +13,24 @@ A web application to connect to an Archipelago server and monitor the chat log i
 
 ## Getting Started
 
-### Installation
+### Installation & Running
 
 1. Clone or download this project
-2. Open `index.html` in your web browser
-3. That's it! No build process or server required
+2. Navigate to the project directory in a terminal
+3. Start a local HTTP server:
+   ```bash
+   python -m http.server 8000
+   ```
+   (Requires Python 3; if using Python 2, use `python -m SimpleHTTPServer 8000`)
+
+4. Open your browser and navigate to `http://localhost:8000`
+
+**Why a server?** The application uses ES6 modules (separate JavaScript files for organization). Modern browsers require HTTP/HTTPS to load modules for security reasons — the `file://` protocol doesn't work.
+
+If you don't have Python, you can use Node.js instead:
+```bash
+npx http-server -p 8000
+```
 
 ### Usage
 
@@ -50,20 +59,13 @@ A web application to connect to an Archipelago server and monitor the chat log i
 Example:
 
 ```
-Player   | Game               | Checks
-Andrew   | Final Fantasy X    | 30/100
-Chris    | Super Metroid      | 12/100
+Player   | Game               | Connected
+Bob      | Final Fantasy X    | Connected
+Steve    | Super Metroid      | Disconnected
 ```
 
 4. **Toggle Theme**:
    - Click the sun/moon icon in the header to switch between light and dark modes
-
-## Browser Compatibility
-
-- Chrome/Chromium 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
 
 ## Archipelago Server Requirements
 
@@ -77,36 +79,48 @@ Chris    | Super Metroid      | 12/100
 - If connecting to a remote server over HTTPS, ensure the server supports secure WebSocket (WSS)
 - The application does not store any connection credentials permanently
 
-## Troubleshooting
-
-### Connection Failed
-- Verify the server host and port are correct
-- Ensure the Archipelago server is running
-- Check that your browser can reach the server (no firewall blocking)
-- If connecting remotely, ensure the domain uses HTTPS or is an IP address
-
-### WebSocket Connection Error
-- Some networks may block WebSocket connections
-- Try using a different network or contacting your network administrator
-- If using HTTPS, the server must support WSS (Secure WebSocket)
-
-### Messages not Appearing
-- Verify you're connected (check the status indicator)
-- Some events may be system events that appear as messages
-- Use the filter buttons to find the message type you're looking for
-
-### Player List Empty
-- The player panel populates when the server sends room information
-- If it remains blank, open your browser's console (F12) and look for `updatePlayers` logs
-- Some servers may not broadcast player data until players have joined; reconnecting often resolves it
-- When only you are connected and no player list data is sent, the app will display your own slot as a placeholder so you can verify the connection
-
 ## Development
 
-The application consists of three main files:
+The application uses a modular architecture for maintainability:
+
+### File Structure
+```
+src/
+├── bootstrap.js           # Entry point - catches ES6 module loading errors
+├── index.js              # Main application class
+├── core/
+│   ├── connectionManager.js   # WebSocket connection handling
+│   └── messageHandler.js      # Message routing and server event handlers
+├── ui/
+│   ├── themeManager.js        # Light/dark theme management
+│   ├── playersList.js         # Player table rendering
+│   └── chatDisplay.js         # Chat message display
+└── utils/
+    ├── helpers.js             # General utilities (UUID, formatTime, escapeHtml)
+    ├── dataLookup.js          # Item and location name lookups
+    └── messageConverter.js    # Human-readable message conversion
+```
+
+### Main Files
 - `index.html` - Structure and layout
 - `styles.css` - Styling and dark mode support
-- `app.js` - Archipelago connection logic and UI interaction
+- `src/bootstrap.js` - ES6 module loader with error handling
+- `src/` directory - Modular JavaScript components
+
+### Making Changes
+
+1. Edit any file in the `src/` directory
+2. Save your changes
+3. Refresh the browser (F5) to see updates
+4. **No server restart needed** — the HTTP server automatically serves updated files
+5. Check the browser console (F12) for any errors
+
+### Architecture Notes
+
+- **ConnectionManager**: Handles WebSocket lifecycle
+- **MessageHandler**: Routes server messages to appropriate handlers
+- **UI Managers**: Handle rendering and user interactions
+- **Utils**: Pure functions for data transformation and lookups
 
 All code is vanilla JavaScript with no external dependencies.
 
