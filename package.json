@@ -1,0 +1,21 @@
+{
+  "name": "archipelago-viewer",
+  "version": "1.0.0",
+  "description": "A web application to connect to an Archipelago server and display chat logs with real-time check tracking",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server"
+  },
+  "keywords": [
+    "archipelago",
+    "multiworld",
+    "randomizer",
+    "web-app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

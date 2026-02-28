@@ -1,0 +1,640 @@
+:root {
+    --primary-color: #3b82f6;
+    --primary-dark: #1e40af;
+    --secondary-color: #8b5cf6;
+    --your-color: #FFA500;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-tertiary: #e5e7eb;
+    
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+    
+    --border-color: #d1d5db;
+    --border-light: #e5e7eb;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode {
+    --primary-color: #60a5fa;
+    --primary-dark: #3b82f6;
+    --secondary-color: #a78bfa;
+    
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-tertiary: #374151;
+    
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    
+    --border-color: #4b5563;
+    --border-light: #374151;
+    
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+    line-height: 1.5;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Connection Panel */
+.connection-panel {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+
+    /* stack form and players table in column */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* no separate players-panel wrapper any more */
+#playersList {
+    width: 100%;
+    margin-top: 0.5rem; /* small gap to separate from connection fields */
+}
+
+/* hide vertical scrollbar on players table; allow parent container to scroll if necessary */
+.players-table {
+    max-height: none;
+    overflow: visible;
+}
+
+.connection-form {
+    /* take full width of panel and align left
+       (outer container controls overall padding) */
+    max-width: none;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+/* combined grid for labels and controls */
+.connection-form .form-fields {
+    display: grid;
+    grid-template-columns: max-content max-content max-content auto;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    align-items: start; /* align tops of all items */
+}
+
+/* hide the wrapper elements so their children become grid items */
+.form-labels,
+.form-controls {
+    display: contents;
+}
+
+.connection-form .form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: center;
+    position: relative; /* make it the positioning context for status */
+}
+
+.connection-status {
+    /* taken out of flow so appearing text does not push the button */
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.connection-form .btn {
+    /* fill the full height of the grid cell, which matches the
+       height of the text inputs thanks to align-items: stretch */
+    height: 100%;
+    line-height: normal;
+    padding: 0.375rem 0.75rem; /* same vertical padding as inputs */
+    box-sizing: border-box;
+    white-space: nowrap;
+    width: auto;
+    display: flex;
+    align-items: center; /* center text vertically */
+    min-width: 5rem; /* accomodate "Connected" without jumping */
+}
+.connection-form h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-input {
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    transition: border-color 0.3s;
+    min-width: 150px;
+    max-width: 250px; /* prevent inputs from stretching too far */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+body.dark-mode .form-input {
+    background-color: var(--bg-tertiary);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.375rem 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-primary:disabled {
+    background-color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: var(--text-tertiary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text-secondary);
+}
+
+.connection-status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.connection-status.success {
+    color: var(--success-color);
+}
+
+.connection-status.error {
+    color: var(--danger-color);
+}
+
+/* Server Info Panel */
+.server-info-panel {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border-light);
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.server-info-panel h3 {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.server-info-grid {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin: 0;
+}
+
+.info-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.info-item .label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.status-badge.connected {
+    background-color: var(--success-color);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+
+/* table layout for players list */
+.players-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.players-table th,
+.players-table td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border-light);
+    text-align: left;
+}
+
+.players-table th {
+    background-color: var(--bg-primary);
+    font-weight: 600;
+}
+
+.players-table tr:nth-child(even) {
+    background-color: var(--bg-tertiary);
+}
+
+/* legacy styles (not used by table) left here in case of future fallback */
+.player-name,
+.player-game,
+.player-progress {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 0.5rem;
+    background-color: var(--bg-tertiary);
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--success-color);
+    transition: width 0.3s;
+}
+
+/* Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.filter-bar {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.filter-bar h3 {
+    font-size: 0.9rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.filter-btn {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-color);
+    background-color: var(--bg-tertiary);
+}
+
+.filter-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Chat Log */
+.chat-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.chat-message {
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-primary);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    animation: slideIn 0.3s ease-out;
+    font-size: 0.9rem;
+}
+
+.chat-message.sent {
+    border-left-color: var(--success-color);
+}
+
+.chat-message.received {
+    border-left-color: var(--warning-color);
+}
+
+.chat-message.system {
+    border-left-color: var(--secondary-color);
+    background-color: var(--bg-tertiary);
+}
+
+.chat-message.yours {
+    border-left-color: var(--your-color);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.message-from {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.message-type {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.1rem;
+    font-weight: 500;
+}
+
+.message-type.sent {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+}
+
+.message-type.received {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--warning-color);
+}
+
+.message-type.system {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: var(--secondary-color);
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+}
+
+.message-content {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+/* Command Input */
+.command-input-area {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.5rem;
+    border-top: 1px solid var(--border-light);
+    background-color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.command-input {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.command-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.command-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .connection-form .form-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .main-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .players-panel {
+        width: 100%;
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .connection-form .form-fields {
+        grid-template-columns: 1fr;
+    }
+    
+    .connection-form h2 {
+        grid-column: 1;
+    }
+    
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    .players-panel {
+        max-height: 150px;
+    }
+}
