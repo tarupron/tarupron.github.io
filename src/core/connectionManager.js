@@ -78,6 +78,13 @@ export class ConnectionManager {
 
     sendCommand(text) {
         if (!this.socket) return;
+        
+        // Only allow commands that start with '/' or '!'
+        if (!text.startsWith('!')) {
+            console.warn('Command must start with "!"');
+            return;
+        }
+        
         const chatMsg = {
             cmd: 'Say',
             text: text
