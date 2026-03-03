@@ -79,49 +79,6 @@ Steve    | Super Metroid      | Disconnected
 - If connecting to a remote server over HTTPS, ensure the server supports secure WebSocket (WSS)
 - The application does not store any connection credentials permanently
 
-## Development
-
-The application uses a modular architecture for maintainability:
-
-### File Structure
-```
-src/
-├── bootstrap.js           # Entry point - catches ES6 module loading errors
-├── index.js              # Main application class
-├── core/
-│   ├── connectionManager.js   # WebSocket connection handling
-│   └── messageHandler.js      # Message routing and server event handlers
-├── ui/
-│   ├── themeManager.js        # Light/dark theme management
-│   ├── playersList.js         # Player table rendering
-│   └── chatDisplay.js         # Chat message display
-└── utils/
-    ├── helpers.js             # General utilities (UUID, formatTime, escapeHtml)
-    ├── dataLookup.js          # Item and location name lookups
-    └── messageConverter.js    # Human-readable message conversion
-```
-
-### Main Files
-- `index.html` - Structure and layout
-- `styles.css` - Styling and dark mode support
-- `src/bootstrap.js` - ES6 module loader with error handling
-- `src/` directory - Modular JavaScript components
-
-### Making Changes
-
-1. Edit any file in the `src/` directory
-2. Save your changes
-3. Refresh the browser (F5) to see updates
-4. **No server restart needed** — the HTTP server automatically serves updated files
-5. Check the browser console (F12) for any errors
-
-### Architecture Notes
-
-- **ConnectionManager**: Handles WebSocket lifecycle
-- **MessageHandler**: Routes server messages to appropriate handlers
-- **UI Managers**: Handle rendering and user interactions
-- **Utils**: Pure functions for data transformation and lookups
-
 All code is vanilla JavaScript with no external dependencies.
 
 ## License
