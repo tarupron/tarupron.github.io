@@ -185,6 +185,12 @@ class ArchipelagoViewer {
         const command = this.commandInput.value.trim();
         if (!command) return;
 
+        // Only allow commands that start with '/' or '!'
+        if (!command.startsWith('/') && !command.startsWith('!')) {
+            this.showStatus('Commands must start with "/" or "!"', 'error');
+            return;
+        }
+
         this.connectionManager.sendCommand(command);
         this.commandInput.value = '';
     }

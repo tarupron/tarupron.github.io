@@ -58,6 +58,15 @@ export class MessageHandler {
         }
     }
 
+    isYourMessage(text, currentPlayerName) {
+        if (!currentPlayerName || !text) return false;
+        const lowerText = text.toLowerCase();
+        const lowerName = currentPlayerName.toLowerCase();
+        // Check if the message is FROM the player (starts with their name)
+        // or TO the player (contains "for [playerName]")
+        return lowerText.startsWith(lowerName) || lowerText.includes(`for ${lowerName}`);
+    }
+
     handleRoomInfo(msg) {
         this.viewer.roomInfo = msg;
         this.viewer.playersListManager.updatePlayers(msg, this.viewer.players);
@@ -223,7 +232,7 @@ export class MessageHandler {
                 // Translate textContent to a more user-friendly format if it contains known patterns
                 const finalText = /^\d/.test(textContent) ? this.viewer.convertMessageToHumanReadable(textContent) : textContent;
                 const message = {
-                    type: finalText.includes('their') ? 'yours' : 'chat',
+                    type: this.isYourMessage(finalText, this.viewer.currentSlot) ? 'yours' : 'chat',
                     text: finalText,
                     timestamp: new Date()
                 };

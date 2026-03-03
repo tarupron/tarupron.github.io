@@ -41,7 +41,7 @@ export class ChatDisplayManager {
             } else if (msg.type === 'system') {
                 this.renderSystemMessage(msgEl, msg);
             } else {
-                // chat, yours, and other types
+                // Chat, yours, and other types
                 this.renderTextMessage(msgEl, msg);
             }
 
