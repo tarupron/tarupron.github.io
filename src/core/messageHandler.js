@@ -111,14 +111,6 @@ export class MessageHandler {
         // Update players with player list from Connected message
         if (msg.players) {
             this.viewer.playersListManager.updatePlayers({ players: msg.players }, this.viewer.players);
-            
-            // Mark all players from the Connected message as online (they're in the room)
-            msg.players.forEach(playerInfo => {
-                const player = this.viewer.players.get(playerInfo.slot);
-                if (player) {
-                    player.online = true;
-                }
-            });
         }
 
         // Update game assignments from slot_info
@@ -128,6 +120,7 @@ export class MessageHandler {
                 const player = this.viewer.players.get(slot);
                 if (player && info.game) {
                     player.game = info.game;
+                    player.online = true;
                 }
             });
         }
