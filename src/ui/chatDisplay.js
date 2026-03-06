@@ -38,6 +38,8 @@ export class ChatDisplayManager {
             // Handle different message types
             if (msg.type === 'check') {
                 this.renderCheckMessage(msgEl, msg, dataPackage, players);
+            } else if (msg.type === 'itemsent') {
+                this.renderItemSentMessage(msgEl, msg, dataPackage, players);
             } else if (msg.type === 'system') {
                 this.renderSystemMessage(msgEl, msg);
             } else {
@@ -65,6 +67,18 @@ export class ChatDisplayManager {
         const locationName = getLocationName(msg.location, msg.from, dataPackage, players);
         console.log('Lookup results:', {itemName, locationName});
         content.innerHTML = `<strong>${escapeHtml(fromName)}</strong> sent <strong>${escapeHtml(itemName)}</strong> to <strong>${escapeHtml(toName)}</strong> (${escapeHtml(locationName)})`;
+        msgEl.appendChild(content);
+    }
+
+    renderItemSentMessage(msgEl, msg, dataPackage, players) {
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        const fromName = players.get(msg.from)?.name || `Player ${msg.from}`;
+        const toName = players.get(msg.to)?.name || `Player ${msg.to}`;
+        // Item belongs to the RECEIVER's world, location is from the SENDER's world
+        const itemName = getItemName(msg.item, msg.to, dataPackage, players);
+        const locationName = getLocationName(msg.location, msg.from, dataPackage, players);
+        content.innerHTML = `<strong>${escapeHtml(fromName)}</strong> sent item <strong>${escapeHtml(itemName)}</strong> to <strong>${escapeHtml(toName)}</strong> (${escapeHtml(locationName)})`;
         msgEl.appendChild(content);
     }
 

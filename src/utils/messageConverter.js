@@ -1,7 +1,6 @@
 import { getItemName, getLocationName } from './dataLookup.js';
 
-export function convertMessageToHumanReadable(msg, dataPackage, players) {
-    const getPlayerName = (playerId) => {
+export function convertMessageToHumanReadable(msg, dataPackage, players) {    const getPlayerName = (playerId) => {
         const player = players.get(Number(playerId));
         return player?.name ?? `Player ${playerId}`;
     };
@@ -10,7 +9,6 @@ export function convertMessageToHumanReadable(msg, dataPackage, players) {
         try {
             return getItemName(Number(itemId), Number(playerSlot), dataPackage, players) || `Item ${itemId}`;
         } catch (error) {
-            console.warn(`Failed to lookup item ${itemId}:`, error);
             return `Item ${itemId}`;
         }
     };
@@ -19,7 +17,6 @@ export function convertMessageToHumanReadable(msg, dataPackage, players) {
         try {
             return getLocationName(Number(locationId), Number(playerSlot), dataPackage, players) || `Location ${locationId}`;
         } catch (error) {
-            console.warn(`Failed to lookup location ${locationId}:`, error);
             return `Location ${locationId}`;
         }
     };

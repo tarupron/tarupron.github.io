@@ -82,6 +82,10 @@ export class MessageHandler {
             this.viewer.playersListManager.setCurrentSlotNumber(msg.slot);
         }
         
+        // Request the DataPackage from the server so we can resolve item/location names
+        const getDataPackageMsg = { cmd: 'GetDataPackage' };
+        this.viewer.connectionManager.socket.send(JSON.stringify([getDataPackageMsg]));
+        
         // Change connect button into disconnect state
         this.viewer.connectBtn.textContent = 'Connected';
         this.viewer.connectBtn.classList.remove('btn-primary');
@@ -168,12 +172,15 @@ export class MessageHandler {
     handlePrintJSON(msg) {
         if (msg.data && Array.isArray(msg.data)) {
             let hasItemCheat = false;
+            let hasItemSend = false;
             let hasTextContent = false;
             let textContent = '';
             
             msg.data.forEach(item => {
                 if (msg.type === 'ItemCheat') {
                     hasItemCheat = true;
+                } else if (msg.type === 'ItemSend') {
+                    hasItemSend = true;
                 } else if (msg.type == 'Join') {
                     // Extract player slot from Join message and mark them as online
                     if (msg.slot !== undefined) {
@@ -225,8 +232,21 @@ export class MessageHandler {
                 });
             }
             
-            // Add text content as a single chat message (if not all ItemCheat)
-            if (hasTextContent && textContent.trim().length > 0) {
+            // Add ItemSend messages - use structured data instead of pre-formatted text
+            if (hasItemSend && msg.item) {
+                const message = {
+                    type: 'itemsent',
+                    from: msg.item.player,
+                    to: msg.receiving,
+                    item: msg.item.item,
+                    location: msg.item.location,
+                    timestamp: new Date()
+                };
+                this.viewer.messages.push(message);
+            }
+            
+            // Add text content as a single chat message (if not all ItemCheat/ItemSend)
+            if (hasTextContent && textContent.trim().length > 0 && !hasItemCheat && !hasItemSend) {
                 // Translate textContent to a more user-friendly format if it contains known patterns
                 const finalText = /^\d/.test(textContent) ? this.viewer.convertMessageToHumanReadable(textContent) : textContent;
                 const message = {
