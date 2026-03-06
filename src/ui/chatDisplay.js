@@ -16,13 +16,20 @@ export class ChatDisplayManager {
         messages.push(message);
     }
 
-    updateDisplay(messages, dataPackage, players) {
+    updateDisplay(messages, dataPackage, players, currentSlotNumber) {
         // Only render new messages that haven't been displayed yet
         const messagesToAdd = messages.slice(this.lastFilteredCount);
         
         messagesToAdd.forEach(msg => {
             const msgEl = document.createElement('div');
-            msgEl.className = `chat-message ${msg.type} message-enter`;
+            let className = `chat-message ${msg.type} message-enter`;
+            
+            // Add 'self-check' class for self-checks on the current player's slot
+            if (currentSlotNumber && msg.from === msg.to && msg.from === currentSlotNumber) {
+                className += ' self-check';
+            }
+            
+            msgEl.className = className;
 
             // Add timestamp header to all messages
             if (msg.timestamp) {
@@ -62,10 +69,8 @@ export class ChatDisplayManager {
         content.className = 'message-content';
         const fromName = players.get(msg.from)?.name || `Player ${msg.from}`;
         const toName = players.get(msg.to)?.name || `Player ${msg.to}`;
-        console.log('renderCheckMessage:', {msgFrom: msg.from, msgTo: msg.to, msgItem: msg.item, msgLocation: msg.location, fromName, toName});
         const itemName = getItemName(msg.item, msg.from, dataPackage, players);
         const locationName = getLocationName(msg.location, msg.from, dataPackage, players);
-        console.log('Lookup results:', {itemName, locationName});
         content.innerHTML = `<strong>${escapeHtml(fromName)}</strong> sent <strong>${escapeHtml(itemName)}</strong> to <strong>${escapeHtml(toName)}</strong> (${escapeHtml(locationName)})`;
         msgEl.appendChild(content);
     }

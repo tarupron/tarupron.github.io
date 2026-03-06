@@ -530,6 +530,10 @@ body.dark-mode .form-input {
     border-left-color: var(--your-color);
 }
 
+.chat-message.self-check {
+    border-left-color: var(--your-color);
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;

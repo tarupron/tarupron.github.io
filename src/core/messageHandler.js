@@ -155,7 +155,7 @@ export class MessageHandler {
 
         // Display system message
         this.viewer.chatDisplayManager.addSystemMessage('Connected to server as ' + this.viewer.currentSlot, this.viewer.messages);
-        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players, this.viewer.currentSlotNumber);
     }
 
     handleChat(msg) {
@@ -166,7 +166,7 @@ export class MessageHandler {
             timestamp: new Date()
         };
         this.viewer.messages.push(message);
-        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+        this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players, this.viewer.currentSlotNumber);
     }
 
     handlePrintJSON(msg) {
@@ -257,7 +257,7 @@ export class MessageHandler {
                 this.viewer.messages.push(message);
             }
             
-            this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players);
+            this.viewer.chatDisplayManager.updateDisplay(this.viewer.messages, this.viewer.dataPackage, this.viewer.players, this.viewer.currentSlotNumber);
         }
     }
 

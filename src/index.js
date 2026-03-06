@@ -173,7 +173,7 @@ class ArchipelagoViewer {
         this.playersListManager.setCurrentSlotNumber(null);
 
         this.chatDisplayManager.addSystemMessage('Disconnected from server', this.messages);
-        this.chatDisplayManager.updateDisplay(this.messages, this.dataPackage, this.players);
+        this.chatDisplayManager.updateDisplay(this.messages, this.dataPackage, this.players, this.currentSlotNumber);
 
         // Reset connection state
         this.currentSlot = null;
