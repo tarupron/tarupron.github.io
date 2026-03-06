@@ -572,11 +572,15 @@ body.dark-mode .form-input {
 }
 
 .chat-message.yours {
-    border-left-color: var(--your-color);
+    border-left-color: var(--primary-color);
 }
 
 .chat-message.self-check {
     border-left-color: var(--your-color);
+}
+
+.chat-message.hint {
+    border-left-color: var(--danger-color);
 }
 
 @keyframes slideIn {

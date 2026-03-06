@@ -24,8 +24,8 @@ export class ChatDisplayManager {
             const msgEl = document.createElement('div');
             let className = `chat-message ${msg.type} message-enter`;
             
-            // Add 'self-check' class for self-checks on the current player's slot
-            if (currentSlotNumber && msg.from === msg.to && msg.from === currentSlotNumber) {
+            // Add 'self-check' class for self-checks on the current player's slot (only for check and hint types)
+            if (currentSlotNumber && (msg.type === 'check' || msg.type === 'hint') && msg.from === msg.to && msg.from === currentSlotNumber) {
                 className += ' self-check';
             }
             
@@ -47,6 +47,8 @@ export class ChatDisplayManager {
                 this.renderCheckMessage(msgEl, msg, dataPackage, players);
             } else if (msg.type === 'itemsent') {
                 this.renderItemSentMessage(msgEl, msg, dataPackage, players);
+            } else if (msg.type === 'hint') {
+                this.renderHintMessage(msgEl, msg, dataPackage, players);
             } else if (msg.type === 'system') {
                 this.renderSystemMessage(msgEl, msg);
             } else {
@@ -84,6 +86,19 @@ export class ChatDisplayManager {
         const itemName = getItemName(msg.item, msg.to, dataPackage, players);
         const locationName = getLocationName(msg.location, msg.from, dataPackage, players);
         content.innerHTML = `<strong>${escapeHtml(fromName)}</strong> sent item <strong>${escapeHtml(itemName)}</strong> to <strong>${escapeHtml(toName)}</strong> (${escapeHtml(locationName)})`;
+        msgEl.appendChild(content);
+    }
+
+    renderHintMessage(msgEl, msg, dataPackage, players) {
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        const fromName = players.get(msg.from)?.name || `Player ${msg.from}`;
+        const toName = players.get(msg.to)?.name || `Player ${msg.to}`;
+        // Item comes from the SENDER's world, location is in the RECEIVER's world
+        const itemName = getItemName(msg.item, msg.from, dataPackage, players);
+        const locationName = getLocationName(msg.location, msg.to, dataPackage, players);
+        const foundStatus = msg.found ? 'found' : 'not found';
+        content.innerHTML = `[Hint]: <strong>${escapeHtml(fromName)}</strong>'s <strong>${escapeHtml(itemName)}</strong> is at <strong>${escapeHtml(locationName)}</strong> in <strong>${escapeHtml(toName)}</strong>'s World. (${foundStatus})`;
         msgEl.appendChild(content);
     }
 
