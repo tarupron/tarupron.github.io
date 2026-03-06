@@ -60,8 +60,10 @@ export class ChatDisplayManager {
         content.className = 'message-content';
         const fromName = players.get(msg.from)?.name || `Player ${msg.from}`;
         const toName = players.get(msg.to)?.name || `Player ${msg.to}`;
+        console.log('renderCheckMessage:', {msgFrom: msg.from, msgTo: msg.to, msgItem: msg.item, msgLocation: msg.location, fromName, toName});
         const itemName = getItemName(msg.item, msg.from, dataPackage, players);
         const locationName = getLocationName(msg.location, msg.from, dataPackage, players);
+        console.log('Lookup results:', {itemName, locationName});
         content.innerHTML = `<strong>${escapeHtml(fromName)}</strong> sent <strong>${escapeHtml(itemName)}</strong> to <strong>${escapeHtml(toName)}</strong> (${escapeHtml(locationName)})`;
         msgEl.appendChild(content);
     }

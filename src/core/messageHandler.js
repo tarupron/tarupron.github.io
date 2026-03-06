@@ -206,14 +206,18 @@ export class MessageHandler {
             if (hasItemCheat) {
                 msg.data.forEach(item => {
                     if (msg.type === 'ItemCheat') {
+                        const itemId = item.item?.item;
+                        const locationId = item.location?.location;
+                        const toSlot = item.item?.player;
+                        console.log('ItemCheat message data:', {itemId, locationId, toSlot, fromSlot: msg.slot, itemObj: item.item, locationObj: item.location});
                         const message = {
                             type: 'check',
                             from: msg.slot,
-                            to: item.item?.player,
-                            item: item.item?.item,
-                            location: item.location?.location,
-                            isReceived: item.item?.player === this.viewer.currentSlotNumber,
-                            isSent: item.slot === this.viewer.currentSlotNumber,
+                            to: toSlot,
+                            item: itemId,
+                            location: locationId,
+                            isReceived: toSlot === this.viewer.currentSlotNumber,
+                            isSent: msg.slot === this.viewer.currentSlotNumber,
                             timestamp: new Date()
                         };
                         this.viewer.messages.push(message);

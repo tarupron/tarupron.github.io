@@ -1,5 +1,9 @@
 export function getItemName(itemId, playerSlot, dataPackage, players) {
-    if (!dataPackage || !itemId) return 'Unknown Item';
+    console.log('getItemName called:', {itemId, playerSlot, hasDataPackage: !!dataPackage, hasPlayers: !!players});
+    if (!dataPackage || !itemId) {
+        console.warn('Early return from getItemName: !dataPackage=' + !dataPackage + ', !itemId=' + !itemId);
+        return 'Unknown Item';
+    }
     
     const player = players.get(playerSlot);
     const game = player?.game;
@@ -27,7 +31,11 @@ export function getItemName(itemId, playerSlot, dataPackage, players) {
 }
 
 export function getLocationName(locationId, playerSlot, dataPackage, players) {
-    if (!dataPackage || !locationId) return 'Unknown Location';
+    console.log('getLocationName called:', {locationId, playerSlot, hasDataPackage: !!dataPackage, hasPlayers: !!players});
+    if (!dataPackage || !locationId) {
+        console.warn('Early return from getLocationName: !dataPackage=' + !dataPackage + ', !locationId=' + !locationId);
+        return 'Unknown Location';
+    }
     
     const player = players.get(playerSlot);
     const game = player?.game;
