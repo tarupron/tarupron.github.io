@@ -49,6 +49,10 @@ class ArchipelagoViewer {
         this.connectBtn = document.getElementById('connectBtn');
         this.connectionStatus = document.getElementById('connectionStatus');
 
+        // Connection panel elements
+        this.connectionPanel = document.getElementById('connectionPanel');
+        this.togglePanelBtn = document.getElementById('togglePanelBtn');
+
         // Main content elements
         this.mainContent = document.getElementById('mainContent');
         this.chatLog = document.getElementById('chatLog');
@@ -58,6 +62,9 @@ class ArchipelagoViewer {
 
         // Theme
         this.themeToggle = document.getElementById('themeToggle');
+        
+        // Load and apply saved panel state
+        this.loadPanelState();
 
         // Log any missing elements for debugging
         const missing = [];
@@ -85,6 +92,10 @@ class ArchipelagoViewer {
             this.themeToggle.addEventListener('click', () => this.themeManager.toggleTheme());
         }
         
+        if (this.togglePanelBtn) {
+            this.togglePanelBtn.addEventListener('click', () => this.togglePanel());
+        }
+        
         if (this.sendCommandBtn) {
             this.sendCommandBtn.addEventListener('click', () => this.sendCommand());
         }
@@ -93,6 +104,23 @@ class ArchipelagoViewer {
             this.commandInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.sendCommand();
             });
+        }
+    }
+
+    togglePanel() {
+        const panel = document.getElementById('connectionPanel');
+        if (panel) {
+            panel.classList.toggle('collapsed');
+            const isCollapsed = panel.classList.contains('collapsed');
+            localStorage.setItem('panelCollapsed', isCollapsed);
+        }
+    }
+
+    loadPanelState() {
+        const isCollapsed = localStorage.getItem('panelCollapsed') === 'true';
+        const panel = document.getElementById('connectionPanel');
+        if (isCollapsed && panel) {
+            panel.classList.add('collapsed');
         }
     }
 
@@ -166,6 +194,12 @@ class ArchipelagoViewer {
 
         // Hide main content area
         this.mainContent.style.display = 'none';
+        
+        // Reset panel to expanded state
+        const panel = document.getElementById('connectionPanel');
+        if (panel) {
+            panel.classList.remove('collapsed');
+        }
 
         this.messages = [];
         this.players.clear();

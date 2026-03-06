@@ -1,6 +1,7 @@
 import { getItemName, getLocationName } from './dataLookup.js';
 
-export function convertMessageToHumanReadable(msg, dataPackage, players) {    const getPlayerName = (playerId) => {
+export function convertMessageToHumanReadable(msg, dataPackage, players) {    
+    const getPlayerName = (playerId) => {
         const player = players.get(Number(playerId));
         return player?.name ?? `Player ${playerId}`;
     };

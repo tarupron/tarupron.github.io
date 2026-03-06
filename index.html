@@ -12,15 +12,19 @@
         <header class="header">
             <div class="header-content">
                 <h1>Archipelago Viewer</h1>
-                <button id="themeToggle" class="theme-toggle" title="Toggle light/dark mode">
-                    <span class="theme-icon">🌙</span>
-                </button>
+                <div class="header-buttons">
+                    <button id="togglePanelBtn" class="toggle-panel-btn" title="Toggle server info">Hide Info</button>
+                    <button id="themeToggle" class="theme-toggle" title="Toggle light/dark mode">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
             </div>
         </header>
 
         <!-- Connection Panel -->
-        <div class="connection-panel">
-            <div class="connection-form">
+        <div class="connection-panel" id="connectionPanel">
+            <div class="connection-panel-content">
+                <div class="connection-form">
                 <div class="form-fields">
                     <div class="form-labels">
                         <div class="form-group">
@@ -67,6 +71,7 @@
                 </div>
             </div>
             <div id="playersList" class="players-list"></div>
+            </div>
         </div>
 
         <!-- Main Content Area -->
