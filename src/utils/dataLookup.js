@@ -18,7 +18,10 @@ export function getItemName(itemId, playerSlot, dataPackage, players) {
 
     if (gameData.item_name_to_id) {
         const itemIdToName = new Map(Object.entries(gameData.item_name_to_id).map(([name, id]) => [id, name]));
-        return itemIdToName.get(itemId);
+        const itemName = itemIdToName.get(itemId);
+        if (itemName) {
+            return itemName;
+        }
     }
     return `Unknown Item (${itemId})`;
 }
@@ -43,7 +46,10 @@ export function getLocationName(locationId, playerSlot, dataPackage, players) {
 
     if (gameData.location_name_to_id) {
         const locationIdToName = new Map(Object.entries(gameData.location_name_to_id).map(([name, id]) => [id, name]));
-        return locationIdToName.get(locationId);
+        const locationName = locationIdToName.get(locationId);
+        if (locationName) {
+            return locationName;
+        }
     }
     return `Unknown Location (${locationId})`;
 }

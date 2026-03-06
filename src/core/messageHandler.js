@@ -208,6 +208,7 @@ export class MessageHandler {
                     if (msg.type === 'ItemCheat') {
                         const message = {
                             type: 'check',
+                            from: msg.slot,
                             to: item.item?.player,
                             item: item.item?.item,
                             location: item.location?.location,
